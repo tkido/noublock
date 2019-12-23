@@ -1,7 +1,6 @@
 package main
 
 var pieces = []Set{
-	// piece 0
 	// ■■
 	// ■■
 	NewSet(
@@ -10,7 +9,16 @@ var pieces = []Set{
 		Vector{0, 1},
 		Vector{1, 1},
 	),
-	// piece 1
+	// 　■
+	// ■■■
+	// 　■
+	NewSet(
+		Vector{0, 0},
+		Vector{-1, 1},
+		Vector{0, 1},
+		Vector{1, 1},
+		Vector{0, 2},
+	),
 	// ■■■■■
 	NewSet(
 		Vector{0, 0},
@@ -19,47 +27,6 @@ var pieces = []Set{
 		Vector{3, 0},
 		Vector{4, 0},
 	),
-	// piece 2
-	// ■■■■
-	// ■
-	NewSet(
-		Vector{0, 0},
-		Vector{1, 0},
-		Vector{2, 0},
-		Vector{3, 0},
-		Vector{0, 1},
-	),
-	// piece 3
-	// ■■■■
-	// 　■
-	NewSet(
-		Vector{0, 0},
-		Vector{1, 0},
-		Vector{2, 0},
-		Vector{3, 0},
-		Vector{1, 1},
-	),
-	// piece 4
-	// 　■■■
-	// ■■
-	NewSet(
-		Vector{0, 0},
-		Vector{1, 0},
-		Vector{2, 0},
-		Vector{-1, 1},
-		Vector{0, 1},
-	),
-	// piece 5
-	// ■■■
-	// ■■
-	NewSet(
-		Vector{0, 0},
-		Vector{1, 0},
-		Vector{2, 0},
-		Vector{0, 1},
-		Vector{1, 1},
-	),
-	// piece 6
 	// ■■■
 	// ■　■
 	NewSet(
@@ -69,7 +36,6 @@ var pieces = []Set{
 		Vector{0, 1},
 		Vector{2, 1},
 	),
-	// piece 7
 	// ■■■
 	// ■
 	// ■
@@ -80,7 +46,6 @@ var pieces = []Set{
 		Vector{0, 1},
 		Vector{0, 2},
 	),
-	// piece 8
 	// 　■■
 	// ■■
 	// ■
@@ -91,7 +56,6 @@ var pieces = []Set{
 		Vector{0, 1},
 		Vector{-1, 2},
 	),
-	// piece 9
 	// ■
 	// ■■■
 	// ■
@@ -101,6 +65,53 @@ var pieces = []Set{
 		Vector{1, 1},
 		Vector{2, 1},
 		Vector{0, 2},
+	),
+	// 　　■
+	// ■■■
+	// ■
+	NewSet(
+		Vector{0, 0},
+		Vector{-2, 1},
+		Vector{-1, 1},
+		Vector{0, 1},
+		Vector{-2, 2},
+	),
+
+	// ■■■■
+	// ■
+	NewSet(
+		Vector{0, 0},
+		Vector{1, 0},
+		Vector{2, 0},
+		Vector{3, 0},
+		Vector{0, 1},
+	),
+	// ■■■■
+	// 　■
+	NewSet(
+		Vector{0, 0},
+		Vector{1, 0},
+		Vector{2, 0},
+		Vector{3, 0},
+		Vector{1, 1},
+	),
+	// 　■■■
+	// ■■
+	NewSet(
+		Vector{0, 0},
+		Vector{1, 0},
+		Vector{2, 0},
+		Vector{-1, 1},
+		Vector{0, 1},
+	),
+	// ■■■
+	// ■■
+	NewSet(
+		Vector{0, 0},
+		Vector{1, 0},
+		Vector{2, 0},
+		Vector{0, 1},
+		Vector{1, 1},
 	),
 	// piece 10(a)
 	// 　■
@@ -112,27 +123,5 @@ var pieces = []Set{
 		Vector{0, 1},
 		Vector{1, 1},
 		Vector{-1, 2},
-	),
-	// piece 11(b)
-	// 　　■
-	// ■■■
-	// ■
-	NewSet(
-		Vector{0, 0},
-		Vector{-2, 1},
-		Vector{-1, 1},
-		Vector{0, 1},
-		Vector{-2, 2},
-	),
-	// piece 12(c)
-	// 　■
-	// ■■■
-	// 　■
-	NewSet(
-		Vector{0, 0},
-		Vector{-1, 1},
-		Vector{0, 1},
-		Vector{1, 1},
-		Vector{0, 2},
 	),
 }

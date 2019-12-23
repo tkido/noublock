@@ -15,35 +15,51 @@ func (ps PieceSet) Append(s Set) PieceSet {
 }
 
 func main() {
+	count := 0
 	pss := []PieceSet{}
+	masks := []uint64{}
 	for i, piece := range pieces {
 		fmt.Printf("piece %d: %s\n", i, piece.String())
-		ps := PieceSet{}
-		for j := 0; j < 4; j++ {
+		mask := uint64(0)
+		ps := PieceSet{piece}
+		for j := 0; j < 3; j++ {
 			piece = piece.Rotate()
 			ps = ps.Append(piece)
 		}
-		piece = piece.Mirror()
-		for j := 0; j < 4; j++ {
+		piece = piece.Rotate().Mirror()
+		ps = ps.Append(piece)
+		for j := 0; j < 3; j++ {
 			piece = piece.Rotate()
 			ps = ps.Append(piece)
 		}
 		fmt.Printf("count = %d\n", len(ps))
-		for _, p := range ps {
+		for j := range ps {
+			mask |= 1 << (count + j)
+		}
+		for j, p := range ps {
+			fmt.Printf("candidate %d\n", count+j)
 			fmt.Println(p.Image())
+			masks = append(masks, mask)
+			printUint64("mask", mask)
 		}
 		pss = append(pss, ps)
+		count += len(ps)
 	}
+	fmt.Println(len(pss))
+	fmt.Println(count)
 
-	board := Set{}
-	for i := -1; i <= 8; i++ {
-		board[Vector{i, -1}] = Null{}
-		board[Vector{i, 8}] = Null{}
-	}
-	for j := -1; j <= 8; j++ {
-		board[Vector{-1, j}] = Null{}
-		board[Vector{8, j}] = Null{}
-	}
-	fmt.Println(board.Board())
+	board := uint64(0)
+	candidates := ^uint64(0)
 
+	printUint64("board", board)
+	printUint64("candidates", candidates)
+}
+
+func printUint64(name string, i uint64) {
+	fmt.Println(name)
+	s := fmt.Sprintf("%064b", i)
+	for j := 0; j < 8; j++ {
+		fmt.Println(s[j*8 : (j+1)*8])
+	}
+	fmt.Println()
 }
