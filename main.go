@@ -1,9 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/bits"
+)
 
+// PieceSet is list of piece
 type PieceSet []Set
 
+// Append appends set to pieceSet
 func (ps PieceSet) Append(s Set) PieceSet {
 	for _, p := range ps {
 		if p.Equal(s) {
@@ -16,21 +21,27 @@ func (ps PieceSet) Append(s Set) PieceSet {
 
 func main() {
 	count := 0
+	shapes := PieceSet{}
 	pss := []PieceSet{}
 	masks := []uint64{}
 	for i, piece := range pieces {
 		fmt.Printf("piece %d: %s\n", i, piece.String())
 		mask := uint64(0)
 		ps := PieceSet{piece}
+		shapes = shapes.Append(piece)
 		for j := 0; j < 3; j++ {
 			piece = piece.Rotate()
 			ps = ps.Append(piece)
+			shapes = shapes.Append(piece)
+
 		}
 		piece = piece.Rotate().Mirror()
 		ps = ps.Append(piece)
+		shapes = shapes.Append(piece)
 		for j := 0; j < 3; j++ {
 			piece = piece.Rotate()
 			ps = ps.Append(piece)
+			shapes = shapes.Append(piece)
 		}
 		fmt.Printf("count = %d\n", len(ps))
 		for j := range ps {
@@ -53,11 +64,53 @@ func main() {
 
 	printUint64("board", board)
 	printUint64("candidates", candidates)
+
+	for i := 0; i < 64; i++ {
+		fmt.Printf("shape %d\n", i)
+		fmt.Println(shapes[i].Image())
+		name := fmt.Sprintf("mask: %d", i)
+		printUint64(name, masks[i])
+	}
+	availables := []uint64{}
+	areaSets := [][]uint64{}
+	for j := 0; j < 8; j++ {
+		for i := 0; i < 8; i++ {
+			v := Vector{i, j}
+			available := uint64(0)
+			areas := []uint64{}
+		LABEL1:
+			for n := 0; n < 64; n++ {
+				s := shapes[n]
+				s = s.Add(v)
+				area := uint64(0)
+				for k := range s {
+					if k.X < 0 || 8 <= k.X || k.Y < 0 || 8 <= k.Y {
+						areas = append(areas, uint64(0))
+						continue LABEL1
+					}
+					area |= 1 << (k.Y*8 + k.X)
+				}
+				printUint64("area", area)
+				areas = append(areas, area)
+				available |= 1 << n
+			}
+			fmt.Printf("%sに置けるのは\n", Vector{i, j}.String())
+			printUint64("available", available)
+			availables = append(availables, available)
+			areaSets = append(areaSets, areas)
+		}
+	}
+
+	printUint64("availables[0]", availables[0])
+	printUint64("areaSets[0][0]", areaSets[0][0])
+	printUint64("areaSets[0][2]", areaSets[0][2])
+	printUint64("areaSets[1][1]", areaSets[1][1])
+
 }
 
 func printUint64(name string, i uint64) {
 	fmt.Println(name)
-	s := fmt.Sprintf("%064b", i)
+	s := fmt.Sprintf("%064b", bits.Reverse64(i))
 	for j := 0; j < 8; j++ {
 		fmt.Println(s[j*8 : (j+1)*8])
 	}
