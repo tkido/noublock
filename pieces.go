@@ -1,5 +1,19 @@
 package main
 
+// PieceSet is list of piece
+type PieceSet []Set
+
+// Append appends set to pieceSet
+func (ps PieceSet) Append(s Set) PieceSet {
+	for _, p := range ps {
+		if p.Equal(s) {
+			return ps
+		}
+	}
+	ps = append(ps, s)
+	return ps
+}
+
 var pieces = []Set{
 	// ■■
 	// ■■

@@ -23,20 +23,19 @@ func TestCount(t *testing.T) {
 	}
 }
 
-func TestMsb(t *testing.T) {
+func TestFind(t *testing.T) {
 	cases := []struct {
 		want  int
 		given uint64
 	}{
-		{-1, 0},
+		{64, 0},
 		{0, 1},
-		{3, 8},
-		{3, 9},
+		{1, 2},
 		{10, 1024},
-		{63, 18446744073709551615},
+		{0, 18446744073709551615},
 	}
 	for _, c := range cases {
-		got := bits.Len64(c.given) - 1
+		got := find(c.given)
 		if got != c.want {
 			t.Errorf("got %v want %v", got, c.want)
 		}

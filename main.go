@@ -5,25 +5,16 @@ import (
 	"math/bits"
 )
 
-// PieceSet is list of piece
-type PieceSet []Set
-
-// Append appends set to pieceSet
-func (ps PieceSet) Append(s Set) PieceSet {
-	for _, p := range ps {
-		if p.Equal(s) {
-			return ps
-		}
-	}
-	ps = append(ps, s)
-	return ps
-}
+var (
+	availables = []uint64{}
+	areaSets   = [][]uint64{}
+	masks      = []uint64{}
+)
 
 func main() {
 	count := 0
 	shapes := PieceSet{}
 	pss := []PieceSet{}
-	masks := []uint64{}
 	for i, piece := range pieces {
 		fmt.Printf("piece %d: %s\n", i, piece.String())
 		mask := uint64(0)
@@ -43,15 +34,15 @@ func main() {
 			ps = ps.Append(piece)
 			shapes = shapes.Append(piece)
 		}
-		fmt.Printf("count = %d\n", len(ps))
+		// fmt.Printf("count = %d\n", len(ps))
 		for j := range ps {
 			mask |= 1 << (count + j)
 		}
-		for j, p := range ps {
-			fmt.Printf("candidate %d\n", count+j)
-			fmt.Println(p.Image())
+		for range ps {
+			// fmt.Printf("candidate %d\n", count+j)
+			// fmt.Println(p.Image())
 			masks = append(masks, mask)
-			printUint64("mask", mask)
+			// printUint64("mask", mask)
 		}
 		pss = append(pss, ps)
 		count += len(ps)
@@ -65,14 +56,13 @@ func main() {
 	printUint64("board", board)
 	printUint64("candidates", candidates)
 
-	for i := 0; i < 64; i++ {
-		fmt.Printf("shape %d\n", i)
-		fmt.Println(shapes[i].Image())
-		name := fmt.Sprintf("mask: %d", i)
-		printUint64(name, masks[i])
-	}
-	availables := []uint64{}
-	areaSets := [][]uint64{}
+	// for i := 0; i < 64; i++ {
+	// 	fmt.Printf("shape %d\n", i)
+	// 	fmt.Println(shapes[i].Image())
+	// 	name := fmt.Sprintf("mask: %d", i)
+	// 	printUint64(name, masks[i])
+	// }
+
 	for j := 0; j < 8; j++ {
 		for i := 0; i < 8; i++ {
 			v := Vector{i, j}
@@ -90,22 +80,70 @@ func main() {
 					}
 					area |= 1 << (k.Y*8 + k.X)
 				}
-				printUint64("area", area)
+				// printUint64("area", area)
 				areas = append(areas, area)
 				available |= 1 << n
 			}
-			fmt.Printf("%sに置けるのは\n", Vector{i, j}.String())
-			printUint64("available", available)
+			// fmt.Printf("%sに置けるのは\n", Vector{i, j}.String())
+			// printUint64("available", available)
 			availables = append(availables, available)
 			areaSets = append(areaSets, areas)
 		}
 	}
 
-	printUint64("availables[0]", availables[0])
-	printUint64("areaSets[0][0]", areaSets[0][0])
-	printUint64("areaSets[0][2]", areaSets[0][2])
-	printUint64("areaSets[1][1]", areaSets[1][1])
+	// printUint64("availables[0]", availables[0])
+	// printUint64("areaSets[0][0]", areaSets[0][0])
+	// printUint64("areaSets[0][2]", areaSets[0][2])
+	// printUint64("areaSets[1][1]", areaSets[1][1])
 
+	mainLoop(NewStatus())
+
+}
+
+func find(i uint64) int {
+	return bits.TrailingZeros64(i)
+}
+
+func mainLoop(s Status) {
+	for {
+		printUint64("s.Board", s.Board)
+		target := find(s.Board)
+		fmt.Printf("target = %d\n", target)
+
+		fmt.Println(target)
+		if target == 64 {
+			fmt.Println("Cleared!!")
+			fmt.Println(s.Log)
+			return
+		}
+		candidates := s.Candidates & availables[target]
+		printUint64("s.Candidates", s.Candidates)
+		printUint64("availables[target]", availables[target])
+		printUint64("candidates", candidates)
+
+		for {
+			candidate := find(candidates)
+			fmt.Printf("candidate = %d\n", candidate)
+			if candidate == 64 {
+				fmt.Println("Impossible!!")
+				return
+			}
+			area := areaSets[target][candidate]
+			if area&s.Board == area {
+				s.Board = s.Board &^ area
+				s.Candidates = s.Candidates &^ masks[candidate]
+				s.Log = append(s.Log, candidate)
+
+				fmt.Printf("Depth: %d\n", s.Depth)
+				printUint64("s.Board", s.Board)
+				printUint64("s.Candidates", s.Candidates)
+				fmt.Println(s.Log)
+				break
+			}
+			fmt.Printf("collision(%d)(%d)\n", target, candidate)
+			candidates = candidates &^ (1 << candidate)
+		}
+	}
 }
 
 func printUint64(name string, i uint64) {
