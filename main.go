@@ -24,7 +24,6 @@ func main() {
 			piece = piece.Rotate()
 			ps = ps.Append(piece)
 			shapes = shapes.Append(piece)
-
 		}
 		piece = piece.Rotate().Mirror()
 		ps = ps.Append(piece)
@@ -38,9 +37,9 @@ func main() {
 		for j := range ps {
 			mask |= 1 << (count + j)
 		}
-		for range ps {
-			// fmt.Printf("candidate %d\n", count+j)
-			// fmt.Println(p.Image())
+		for j, p := range ps {
+			fmt.Printf("candidate %d\n", count+j)
+			fmt.Println(p.Image())
 			masks = append(masks, mask)
 			// printUint64("mask", mask)
 		}
@@ -96,53 +95,55 @@ func main() {
 	// printUint64("areaSets[0][2]", areaSets[0][2])
 	// printUint64("areaSets[1][1]", areaSets[1][1])
 
-	mainLoop(NewStatus())
-
+	loop(NewStatus())
+	fmt.Printf("clearCount = %d\n", clearCount/8)
 }
 
 func find(i uint64) int {
 	return bits.TrailingZeros64(i)
 }
 
-func mainLoop(s Status) {
+var clearCount = 0
+
+func loop(s Status) bool {
+	// printUint64("s.Board", s.Board)
+	// printUint64("s.Candidates", s.Candidates)
+	// fmt.Println(s.Log)
+
+	target := find(s.Board)
+	// fmt.Printf("target = %d\n", target)
+
+	// fmt.Println(target)
+	if target == 64 {
+		// fmt.Println("Cleared!!")
+		fmt.Println(s.Log)
+		clearCount++
+		return false
+	}
+	candidates := s.Candidates & availables[target]
+	// printUint64("s.Candidates", s.Candidates)
+	// printUint64("availables[target]", availables[target])
+	// printUint64("candidates", candidates)
+
 	for {
-		printUint64("s.Board", s.Board)
-		target := find(s.Board)
-		fmt.Printf("target = %d\n", target)
-
-		fmt.Println(target)
-		if target == 64 {
-			fmt.Println("Cleared!!")
-			fmt.Println(s.Log)
-			return
+		candidate := find(candidates)
+		// fmt.Printf("candidate = %d\n", candidate)
+		if candidate == 64 {
+			// fmt.Println("Impossible!!")
+			return false
 		}
-		candidates := s.Candidates & availables[target]
-		printUint64("s.Candidates", s.Candidates)
-		printUint64("availables[target]", availables[target])
-		printUint64("candidates", candidates)
-
-		for {
-			candidate := find(candidates)
-			fmt.Printf("candidate = %d\n", candidate)
-			if candidate == 64 {
-				fmt.Println("Impossible!!")
-				return
+		area := areaSets[target][candidate]
+		if area&s.Board == area {
+			copied := s.Copy()
+			copied.Board = copied.Board &^ area
+			copied.Candidates = copied.Candidates &^ masks[candidate]
+			copied.Log = append(copied.Log, candidate)
+			if loop(copied) {
+				return true
 			}
-			area := areaSets[target][candidate]
-			if area&s.Board == area {
-				s.Board = s.Board &^ area
-				s.Candidates = s.Candidates &^ masks[candidate]
-				s.Log = append(s.Log, candidate)
-
-				fmt.Printf("Depth: %d\n", s.Depth)
-				printUint64("s.Board", s.Board)
-				printUint64("s.Candidates", s.Candidates)
-				fmt.Println(s.Log)
-				break
-			}
-			fmt.Printf("collision(%d)(%d)\n", target, candidate)
-			candidates = candidates &^ (1 << candidate)
 		}
+		// fmt.Printf("collision(%d)(%d)\n", target, candidate)
+		candidates = candidates &^ (1 << candidate)
 	}
 }
 
