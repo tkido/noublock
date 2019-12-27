@@ -14,7 +14,6 @@ var (
 func main() {
 	count := 0
 	shapes := PieceSet{}
-	pss := []PieceSet{}
 	for i, piece := range pieces {
 		fmt.Printf("piece %d: %s\n", i, piece.String())
 		mask := uint64(0)
@@ -43,17 +42,9 @@ func main() {
 			masks = append(masks, mask)
 			// printUint64("mask", mask)
 		}
-		pss = append(pss, ps)
 		count += len(ps)
 	}
-	fmt.Println(len(pss))
 	fmt.Println(count)
-
-	board := uint64(0)
-	candidates := ^uint64(0)
-
-	printUint64("board", board)
-	printUint64("candidates", candidates)
 
 	// for i := 0; i < 64; i++ {
 	// 	fmt.Printf("shape %d\n", i)
